@@ -1,0 +1,56 @@
+/* File: src/styles/settings.css */
+
+body {
+  margin: 0;
+  font-family: 'Georgia', serif;
+}
+
+.settings-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #d0f5eb;
+  padding: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 80px;
+}
+
+.sidebar li {
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.sidebar li svg {
+  margin-right: 10px;
+}
+
+.sidebar li.active {
+  background: white;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+.main-content {
+  flex-grow: 1;
+  background-color: #aee5d8;
+  padding: 40px;
+}
+
+.main-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.setting-option {
+  font-size: 1.5rem;
+  margin: 20px 0;
+}

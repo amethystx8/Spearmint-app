@@ -1,0 +1,182 @@
+/* Reset */
+
+body, h1, h2, h3, p, ul, li, button {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+  color: #155c4a;
+}
+
+/* Layout */
+.dashboard-wrapper {
+  display: flex;
+  height: 100vh;
+  background-color: #A8E6CF;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 200px;
+  background-color: #1e1e2f;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 1rem 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: #ccc;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 14px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logout-btn:hover {
+  color: #fff;
+}
+
+/* Main content */
+.dashboard-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Header: Greeting and Clock */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.greeting {
+  font-size: 24px;
+  color: #333;
+}
+
+.subtext {
+  font-size: 14px;
+  color: #777;
+}
+
+.time-display {
+  text-align: right;
+  font-weight: bold;
+  color: #444;
+}
+
+/* Grid Layout */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Top: Task & Schedule */
+.task-schedule-container {
+  display: flex;
+  gap: 2rem;
+}
+
+/* Today's Tasks */
+.task-box, .schedule-box {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1rem;
+  flex: 1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.task-box h3, .schedule-box h3 {
+  margin-bottom: 1rem;
+  font-size: 18px;
+  color: #333;
+}
+
+/* Schedule */
+.schedule-item {
+  margin-bottom: 0.5rem;
+  font-size: 14px;
+  padding: 0.5rem 1.5rem;
+  border-radius: 2rem;
+  background-color: #bde3bf;
+}
+
+/* Bottom: Mint & Progress */
+.utility-box {
+  display: flex;
+  gap: 2rem;
+}
+
+/* Need a Mint */
+.mint-button {
+  background-color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.mint-button:hover {
+  background-color: #7cd67c;
+}
+
+/* Progress Chart */
+.progress-chart {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1rem;
+  flex-shrink: 0;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.progress-chart svg {
+  margin-bottom: 0.5rem;
+}
+
+.progress-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 10;
+}
+
+.progress-fg {
+  fill: none;
+  stroke: #4caf50;
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.3s ease-in-out;
+}
+.progress-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
