@@ -1,16 +1,21 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './assets/settings.css';
+import Sidebar from './components/Sidebar';
 
 export default function Settings() {
+  const navigate = useNavigate();
+  
+  // Check if user is logged in
+  useEffect(() => {
+    if (!localStorage.getItem('username')) {
+      navigate('/login');
+      return;
+    }
+  }, [navigate]);
   return (
     <div className="settings-container">
-      <div className="sidebar">
-        <ul>
-          <li>🏠 Dashboard</li>
-          <li>📅 To do</li>
-          <li>⏱ Pomodoro</li>
-          <li className="active">⚙️ Settings</li>
-        </ul>
-      </div>
+      <Sidebar />
 
       <div className="main-content">
         <h1>SETTINGS</h1>

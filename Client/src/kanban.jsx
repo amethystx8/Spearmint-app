@@ -1,6 +1,7 @@
 // File: src/pages/Kanban.jsx
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { db } from './firebase';
 import {
   collection,
@@ -11,9 +12,19 @@ import {
   doc
 } from 'firebase/firestore';
 import './assets/kanban.css';
+import Sidebar from './components/Sidebar';
 
 export default function Kanban() {
+  const navigate = useNavigate();
   const name = localStorage.getItem('username') || 'Ankur';
+  
+  // Check if user is logged in
+  useEffect(() => {
+    if (!localStorage.getItem('username')) {
+      navigate('/login');
+      return;
+    }
+  }, [navigate]);
   const [tasks, setTasks] = useState({ todo: [], doing: [], done: [] });
 
   useEffect(() => {
@@ -61,15 +72,7 @@ export default function Kanban() {
 
   return (
     <div className="kanban-container">
-      <div className="sidebar">
-        <h2>Hey {name}!</h2>
-        <ul>
-          <li>🏠 Dashboard</li>
-          <li className="active">📅 To do</li>
-          <li>⏱ Pomodoro</li>
-          <li>⚙️ Settings</li>
-        </ul>
-      </div>
+      <Sidebar />
 
       <main className="kanban-main">
         <div className="kanban-header">

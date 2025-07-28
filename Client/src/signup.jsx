@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './assets/signup.css';
 import axios from 'axios';
 
 export default function Signup() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullname: '',
     username: '',
@@ -20,13 +22,14 @@ export default function Signup() {
     e.preventDefault();
     try {
       await axios.post('http://localhost:3000/users/register', formData);
-      alert('User registered!');
+      alert('User registered successfully! Please login to continue.');
       setFormData({
         fullname: '',
         username: '',
         email: '',
         password: ''
       });
+      navigate('/login'); // Redirect to login after successful signup
     } catch (err) {
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
@@ -85,6 +88,9 @@ export default function Signup() {
         <button type="submit">Register</button>
         {error && <div className="error-message">{error}</div>}
       </form>
+      <p style={{ textAlign: 'center', marginTop: '20px' }}>
+        Already have an account? <a href="/login" style={{ color: '#4CAF50', textDecoration: 'none' }}>Login here</a>
+      </p>
     </div>
   );
 }

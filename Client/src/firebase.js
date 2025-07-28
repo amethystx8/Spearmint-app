@@ -3,12 +3,13 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBDeYi5YTDma6Pk8PyPzhOWtm_EBbwC0Zw",
+  authDomain: "spear-mint-dac7c.firebaseapp.com",
+  projectId: "spear-mint-dac7c",
+  storageBucket: "spear-mint-dac7c.firebasestorage.app",
+  messagingSenderId: "720926553155",
+  appId: "1:720926553155:web:60120570d5283ec2ba90f6",
+  measurementId: "G-EFQSK4SX67"
 };
 
 const app = initializeApp(firebaseConfig);

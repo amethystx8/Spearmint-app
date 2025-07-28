@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './assets/signup.css'; // Reuse signup styles
 
 export default function Login() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -18,6 +20,7 @@ export default function Login() {
       const res = await axios.post('http://localhost:3000/users/login', formData);
       alert(`Welcome back, ${res.data.fullname}!`);
       localStorage.setItem('username', res.data.username);
+      navigate('/dashboard'); // Redirect to dashboard after successful login
     } catch (err) {
       console.error(err);
       alert('Login failed! Please check your credentials.');
@@ -49,6 +52,9 @@ export default function Login() {
         />
         <button type="submit">Login</button>
       </form>
+      <p style={{ textAlign: 'center', marginTop: '20px' }}>
+        Don't have an account? <a href="/signup" style={{ color: '#4CAF50', textDecoration: 'none' }}>Sign up here</a>
+      </p>
     </div>
   );
 }
