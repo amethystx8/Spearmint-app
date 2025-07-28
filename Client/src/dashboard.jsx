@@ -3,334 +3,803 @@ import { Link, useNavigate } from 'react-router-dom';
 import './assets/dashboard.css';
 import "./index.css";
 import { db } from './firebase';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
 import Sidebar from './components/Sidebar';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const name = localStorage.getItem('username') || 'Ankur';
+  const username = localStorage.getItem('username') || 'Friend';
   
   // Check if user is logged in
   useEffect(() => {
-    if (!localStorage.getItem('username')) {
+    const username = localStorage.getItem('username');
+    const user = localStorage.getItem('user');
+    console.log('Dashboard auth check:', { username, user }); // Debug log
+    if (!username) {
+      console.log('No username found, redirecting to login');
+      localStorage.clear(); // Clear any invalid session data
       navigate('/login');
       return;
     }
   }, [navigate]);
+
+  // Helper function to get user safely
+  const getUser = () => {
+    const userData = localStorage.getItem('user');
+    const username = localStorage.getItem('username');
+    
+    // If no user data but we have username, create a user object with username as uid
+    if (!userData && username) {
+      console.log('No user object found, creating one with username as uid');
+      return { uid: username, username: username }; // Temporary fallback
+    }
+    
+    if (!userData) {
+      console.error('No user data found in localStorage');
+      return null;
+    }
+    
+    try {
+      const user = JSON.parse(userData);
+      if (!user.uid) {
+        console.log('User data missing uid, using username as uid');
+        user.uid = user.username || username; // Fallback to username
+      }
+      return user;
+    } catch (error) {
+      console.error('Invalid user data in localStorage:', error);
+      return null;
+    }
+  };
+
+  // Core state
   const [time, setTime] = useState(new Date());
-  const [tasks, setTasks] = useState([]);
-  const [completed, setCompleted] = useState(0);
+  const [isBreatherMode, setIsBreatherMode] = useState(false);
+  
+  // Today's Schedule state
+  const [todaysSchedule, setTodaysSchedule] = useState([]);
+  
+  // Pomodoro Summary state
+  const [pomodoroSessions, setPomodoroSessions] = useState(0);
+  
+  // Kanban Summary state
+  const [kanbanSummary, setKanbanSummary] = useState({
+    todo: 0,
+    doing: 0,
+    done: 0
+  });
+  
+  // Mental Well-being state
+  const [journalEntry, setJournalEntry] = useState({
+    feeling: '',
+    gratitude: '',
+    submitted: false
+  });
 
-  // Schedules from Firestore with source tracking
-  const [schedule, setSchedule] = useState([]);
-  const [showScheduleInput, setShowScheduleInput] = useState(false);
-  const [newSchedule, setNewSchedule] = useState({ time: '', task: '', source: 'dashboard' });
+  // Mood tracker state
+  const [selectedMood, setSelectedMood] = useState('');
+  
+  // Schedule management state
+  const [showAddSchedule, setShowAddSchedule] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    time: '',
+    date: new Date().toISOString().split('T')[0]
+  });
+  const [editingTask, setEditingTask] = useState(null);
+  const [alerts, setAlerts] = useState([]);
+  
+  // Daily affirmation
+  const affirmations = [
+    "You are capable of amazing things! ✨",
+    "Every small step counts toward your goals 🌱",
+    "You have the strength to handle whatever comes your way 💪",
+    "Progress, not perfection, is what matters 🎯",
+    "You are worthy of kindness, especially from yourself 💚",
+    "Your efforts today are building tomorrow's success 🌟",
+    "It's okay to take breaks - rest is productive too 🌿",
+    "You're doing better than you think you are 🌈"
+  ];
+  
+  const [dailyAffirmation] = useState(
+    affirmations[Math.floor(Math.random() * affirmations.length)]
+  );
 
-  // Task management
-  const [showTaskInput, setShowTaskInput] = useState(false);
-  const [newTask, setNewTask] = useState({ title: '', priority: 'Low', completed: false, source: 'dashboard' });
+  // Positive reinforcement messages
+  const reinforcements = [
+    "You're on a roll today! 🔥",
+    "Crushing it as always! 💯",
+    "Your focus is inspiring! ⭐",
+    "Making great progress! 🚀",
+    "You've got this! 💪",
+    "Mint-certified productivity! 🌿"
+  ];
 
+  const [reinforcement] = useState(
+    Math.random() > 0.3 ? reinforcements[Math.floor(Math.random() * reinforcements.length)] : ""
+  );
+
+  // Time updates
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
+  // Data fetching on mount
   useEffect(() => {
-    fetchTasks();
-    fetchSchedules();
+    fetchTodaysSchedule();
+    fetchPomodoroSessions();
+    fetchKanbanSummary();
+    checkJournalStatus();
+    setupAlertSystem();
   }, []);
 
-  const fetchTasks = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, 'tasks'));
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  // Alert system for upcoming tasks
+  useEffect(() => {
+    const checkAlerts = () => {
+      const now = new Date();
+      const currentTime = now.getHours() * 60 + now.getMinutes(); // minutes since midnight
       
-      // Filter for today's tasks and dashboard/kanban sources
-      const today = new Date().toISOString().split('T')[0];
-      const todayTasks = data.filter(task => {
-        const taskDate = task.date || today;
-        return taskDate === today && (task.source === 'dashboard' || task.source === 'kanban' || !task.source);
+      todaysSchedule.forEach(task => {
+        if (!task.completed && task.time) {
+          const [taskHour, taskMinute] = task.time.split(':').map(Number);
+          const taskTime = taskHour * 60 + taskMinute;
+          const timeDiff = taskTime - currentTime;
+          
+          // 5-minute alert
+          if (timeDiff === 5 && !alerts.includes(task.id)) {
+            setAlerts(prev => [...prev, task.id]);
+            showTaskAlert(task);
+          }
+        }
       });
-      
-      setTasks(todayTasks);
-      setCompleted(todayTasks.filter(task => task.completed).length);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
+    };
+
+    const interval = setInterval(checkAlerts, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [todaysSchedule, alerts]);
+
+  const setupAlertSystem = () => {
+    // Request notification permission
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
     }
   };
 
-  // Fetch schedules from Firestore with source support
-  const fetchSchedules = async () => {
+  const showTaskAlert = (task) => {
+    // Browser notification
+    if (Notification.permission === "granted") {
+      new Notification("Upcoming Task", {
+        body: `"${task.task}" is starting in 5 minutes at ${formatTime12Hour(task.time)}`,
+        icon: "🔔"
+      });
+    }
+    
+    // Dashboard alert
+    alert(`⏰ Reminder: "${task.task}" is starting in 5 minutes at ${formatTime12Hour(task.time)}`);
+  };
+
+  const formatTime12Hour = (time24) => {
+    if (!time24) return '';
+    const [hours, minutes] = time24.split(':');
+    const hour12 = hours % 12 || 12;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
+  // Fetch today's schedule
+  const fetchTodaysSchedule = async () => {
     try {
-      const snapshot = await getDocs(collection(db, 'schedules'));
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const today = new Date().toISOString().split('T')[0];
+      const user = getUser();
+      if (!user) return;
       
-      // Support both dashboard and kanban sources
-      const filteredSchedules = data.filter(item => 
-        item.source === 'dashboard' || item.source === 'kanban' || !item.source
+      const snapshot = await getDocs(
+        query(
+          collection(db, 'schedules'),
+          where('userId', '==', user.uid),
+          where('date', '==', today)
+        )
       );
       
-      setSchedule(filteredSchedules.sort((a, b) => a.time.localeCompare(b.time)));
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // Sort by time
+      const sortedData = data.sort((a, b) => {
+        if (!a.time) return 1;
+        if (!b.time) return -1;
+        return a.time.localeCompare(b.time);
+      });
+      
+      setTodaysSchedule(sortedData);
     } catch (error) {
-      console.error('Error fetching schedules:', error);
+      console.warn('Using mock schedule data:', error);
+      setTodaysSchedule([
+        { id: '1', time: '09:00', task: 'Morning planning', completed: false },
+        { id: '2', time: '10:30', task: 'Project work', completed: false },
+        { id: '3', time: '14:00', task: 'Team meeting', completed: true },
+        { id: '4', time: '16:00', task: 'Review tasks', completed: false }
+      ]);
     }
   };
 
-  // Add schedule to Firestore with source tracking
-  const handleAddSchedule = async () => {
-    if (!newSchedule.time.trim() || !newSchedule.task.trim()) return;
-    
+  // Add new schedule task
+  const addScheduleTask = async () => {
+    if (!newTask.title.trim() || !newTask.time) {
+      alert('Please fill in all fields');
+      return;
+    }
+
     try {
+      const user = getUser();
+      if (!user) return;
+      
+      // Check for time slot conflicts
+      const existingTasksSnapshot = await getDocs(
+        query(
+          collection(db, 'schedules'),
+          where('userId', '==', user.uid),
+          where('date', '==', new Date().toISOString().split('T')[0]), // Always check today's date
+          where('time', '==', newTask.time)
+        )
+      );
+
+      if (!existingTasksSnapshot.empty) {
+        alert('A task is already scheduled for this time slot');
+        return;
+      }
+
       await addDoc(collection(db, 'schedules'), {
-        ...newSchedule,
-        createdAt: new Date(),
-        date: new Date().toISOString().split('T')[0]
+        userId: user.uid,
+        task: newTask.title,
+        time: newTask.time,
+        date: new Date().toISOString().split('T')[0], // Always use today's date
+        completed: false,
+        createdAt: new Date()
       });
-      setNewSchedule({ time: '', task: '', source: 'dashboard' });
-      setShowScheduleInput(false);
-      fetchSchedules();
-    } catch (error) {
-      console.error('Error adding schedule:', error);
-    }
-  };
 
-  // Add task to Firestore
-  const handleAddTask = async () => {
-    if (!newTask.title.trim()) return;
-    
-    try {
-      await addDoc(collection(db, 'tasks'), {
-        ...newTask,
-        createdAt: new Date(),
-        date: new Date().toISOString().split('T')[0]
-      });
-      setNewTask({ title: '', priority: 'Low', completed: false, source: 'dashboard' });
-      setShowTaskInput(false);
-      fetchTasks();
+      setNewTask({ title: '', time: '', date: new Date().toISOString().split('T')[0] });
+      setShowAddSchedule(false);
+      fetchTodaysSchedule();
+      alert('Task added successfully! ✨');
     } catch (error) {
       console.error('Error adding task:', error);
+      alert('Failed to add task. Please try again.');
     }
   };
 
-  // Toggle task completion
-  const toggleTaskCompletion = async (taskId, currentStatus) => {
+  // Edit schedule task
+  const editScheduleTask = async (taskId, updatedData) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
-      await updateDoc(taskRef, {
-        completed: !currentStatus
+      const user = getUser();
+      if (!user) return;
+      
+      // Check for time slot conflicts if time is being changed
+      if (updatedData.time) {
+        const existingTasksSnapshot = await getDocs(
+          query(
+            collection(db, 'schedules'),
+            where('userId', '==', user.uid),
+            where('date', '==', new Date().toISOString().split('T')[0]), // Always use today's date
+            where('time', '==', updatedData.time)
+          )
+        );
+
+        const conflictingTasks = existingTasksSnapshot.docs.filter(doc => doc.id !== taskId);
+        if (conflictingTasks.length > 0) {
+          alert('A task is already scheduled for this time slot');
+          return;
+        }
+      }
+
+      await updateDoc(doc(db, 'schedules', taskId), {
+        ...updatedData,
+        updatedAt: new Date()
       });
-      fetchTasks();
+
+      setEditingTask(null);
+      fetchTodaysSchedule();
+      alert('Task updated successfully! ✨');
     } catch (error) {
       console.error('Error updating task:', error);
+      alert('Failed to update task. Please try again.');
     }
   };
 
-  // Delete task
-  const deleteTask = async (taskId) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      try {
-        await deleteDoc(doc(db, 'tasks', taskId));
-        fetchTasks();
-      } catch (error) {
-        console.error('Error deleting task:', error);
+  // Fetch Pomodoro sessions count for today
+  const fetchPomodoroSessions = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      // This would typically fetch from a pomodoro sessions collection
+      // For now, using localStorage or mock data
+      const sessions = localStorage.getItem(`pomodoro_sessions_${today}`) || 0;
+      setPomodoroSessions(parseInt(sessions));
+    } catch (error) {
+      console.warn('Could not fetch Pomodoro sessions:', error);
+      setPomodoroSessions(0);
+    }
+  };
+
+  // Fetch Kanban task summary
+  const fetchKanbanSummary = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, 'tasks'));
+      const tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      const summary = tasks.reduce((acc, task) => {
+        if (task.status === 'todo' || !task.status) acc.todo++;
+        else if (task.status === 'doing') acc.doing++;
+        else if (task.status === 'done' || task.completed) acc.done++;
+        return acc;
+      }, { todo: 0, doing: 0, done: 0 });
+      
+      setKanbanSummary(summary);
+    } catch (error) {
+      console.warn('Using mock Kanban data:', error);
+      setKanbanSummary({ todo: 3, doing: 2, done: 5 });
+    }
+  };
+
+  // Check if journal entry was submitted today
+  const checkJournalStatus = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const user = getUser();
+      if (!user) return;
+      
+      const snapshot = await getDocs(
+        query(
+          collection(db, 'userJournal'),
+          where('userId', '==', user.uid),
+          where('date', '==', today)
+        )
+      );
+      
+      setJournalEntry(prev => ({ ...prev, submitted: !snapshot.empty }));
+    } catch (error) {
+      console.warn('Could not check journal status:', error);
+    }
+  };
+
+  // Toggle schedule item completion
+  const toggleScheduleCompletion = async (itemId, currentStatus) => {
+    const task = todaysSchedule.find(t => t.id === itemId);
+    if (!task) return;
+
+    // Check if task can be completed (only today's tasks with time <= current time)
+    const now = new Date();
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    const today = new Date().toISOString().split('T')[0];
+
+    if (task.date === today && task.time > currentTime && !currentStatus) {
+      alert('This task cannot be completed yet - it\'s scheduled for later today');
+      return;
+    }
+
+    try {
+      const itemRef = doc(db, 'schedules', itemId);
+      await updateDoc(itemRef, {
+        completed: !currentStatus,
+        completedAt: !currentStatus ? new Date() : null
+      });
+      fetchTodaysSchedule();
+    } catch (error) {
+      console.error('Error updating schedule item:', error);
+      // Update locally if Firebase fails
+      setTodaysSchedule(prev => 
+        prev.map(item => 
+          item.id === itemId ? { ...item, completed: !currentStatus } : item
+        )
+      );
+    }
+  };
+
+  // Submit journal entry with improved Firestore integration
+  const submitJournalEntry = async () => {
+    if (!selectedMood || !journalEntry.gratitude.trim() || !journalEntry.feeling.trim()) {
+      alert('Please complete all fields: select your mood, describe how you felt, and add something you\'re grateful for.');
+      return;
+    }
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const user = getUser();
+      if (!user) return;
+      
+      // Check if entry already exists
+      const existingSnapshot = await getDocs(
+        query(
+          collection(db, 'userJournal'),
+          where('userId', '==', user.uid),
+          where('date', '==', today)
+        )
+      );
+
+      if (!existingSnapshot.empty) {
+        alert('You have already submitted your journal entry for today! ✨');
+        return;
       }
+
+      await addDoc(collection(db, 'userJournal'), {
+        userId: user.uid,
+        username: username,
+        date: today,
+        mood: selectedMood,
+        feeling: journalEntry.feeling,
+        gratitude: journalEntry.gratitude,
+        affirmation: dailyAffirmation,
+        timestamp: new Date(),
+        createdAt: new Date()
+      });
+      
+      setJournalEntry(prev => ({ ...prev, submitted: true }));
+      setSelectedMood('');
+      
+      // Show success message
+      alert('✨ Your thoughts have been minted! Thank you for taking care of yourself today.');
+    } catch (error) {
+      console.error('Error submitting journal:', error);
+      alert('Could not save your entry right now. Please try again later.');
     }
   };
 
-  // Delete schedule
-  const deleteSchedule = async (scheduleId) => {
-    if (window.confirm('Are you sure you want to delete this schedule item?')) {
-      try {
-        await deleteDoc(doc(db, 'schedules', scheduleId));
-        fetchSchedules();
-      } catch (error) {
-        console.error('Error deleting schedule:', error);
-      }
-    }
+  // Logout function
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/login');
   };
 
-  const totalTasks = tasks.length;
-  const percent = totalTasks ? Math.round((completed / totalTasks) * 100) : 0;
+  // Get current time in HH:MM format for filtering past tasks
+  const getCurrentTime = () => {
+    return time.toTimeString().slice(0, 5);
+  };
 
-  const quotes = [
-    'Take a deep breath.',
-    'You are doing great.',
-    'Pause. Sip water. Reset.',
-    'Focus on progress, not perfection.',
-    'Small steps lead to great achievements.',
-    'You\'ve got this! 🌿'
-  ];
-  const mintQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  // Check if task can be ticked off
+  const canTickTask = (task) => {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    
+    // Can tick if it's today and time has passed, or if it's already completed
+    return task.completed || (task.date === today && task.time <= currentTime);
+  };
+
+  // Check if task is in the future
+  const isFutureTask = (task) => {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    
+    return task.date > today || (task.date === today && task.time > currentTime);
+  };
+
+  // Filter upcoming tasks (show all for today)
+  const upcomingTasks = todaysSchedule;
+
+  // Get next upcoming task
+  const nextTask = upcomingTasks.find(item => !item.completed);
+
+  // Breather Mode Component
+  if (isBreatherMode) {
+    return (
+      <div className="breather-mode">
+        <div className="breather-content">
+          <div className="meditation-animation">
+            <div className="breathing-circle"></div>
+          </div>
+          <h2>Take a moment to breathe</h2>
+          <p>Inhale... hold... exhale... 🌿</p>
+          <button 
+            className="mint-button"
+            onClick={() => setIsBreatherMode(false)}
+          >
+            Enough Mint 🍃
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
+
     <div className="dashboard-wrapper">
       <Sidebar />
 
       <main className="dashboard-main">
+        {/* User Greeting with Date/Time */}
         <div className="dashboard-header">
-          <div>
-            <h2 className="greeting">Hey {name}!</h2>
-            <p className="subtext">productivity 100% mint-certified</p>
+          <div className="greeting-section">
+            <h2 className="greeting">Hi {username} 👋</h2>
+            <p className="daily-affirmation">{dailyAffirmation}</p>
+            {reinforcement && (
+              <p className="subtext positive-reinforcement">{reinforcement}</p>
+            )}
           </div>
+          <button onClick={handleLogout} className="logout-btn">Logout</button>
           <div className="time-display">
             {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}<br />
             {time.toDateString()}
           </div>
         </div>
 
+
+        {/* Need a Mint Button - White style */}
+        <div className="mint-action-section">
+          <button 
+            onClick={() => setIsBreatherMode(true)}
+            className="white-mint-button"
+          >
+            🌿 Need a Mint? 🍃
+          </button>
+        </div>
+
         <div className="dashboard-grid">
-          <div className="task-schedule-container">
-            <div className="task-box">
-              <div className="section-header">
-                <h3>TODAY'S TASKS</h3>
-                <button 
-                  onClick={() => setShowTaskInput(!showTaskInput)} 
-                  className="add-btn"
-                >
-                  {showTaskInput ? '✕' : '+'} 
-                </button>
+          {/* KPIs and Schedule Side by Side */}
+          <div className="kpi-schedule-container">
+            {/* KPIs Section */}
+            <div className="kpi-section">
+              {/* Pomodoro Summary */}
+              <div className="summary-card pomodoro-card">
+                <div className="section-header">
+                  <h3>🍅 FOCUS</h3>
+                </div>
+                <div className="summary-content">
+                  <div className="session-count">
+                    <span className="big-number">{pomodoroSessions}</span>
+                    <span className="label">sessions today</span>
+                  </div>
+                  <Link to="/pomodoro" className="summary-action">
+                    <button className="mint-button small">
+                      Start Timer
+                    </button>
+                  </Link>
+                </div>
               </div>
 
-              {showTaskInput && (
-                <div className="task-input">
+              {/* Kanban Task Summary */}
+              <div className="summary-card kanban-card">
+                <div className="section-header">
+                  <h3>📋 TASKS</h3>
+                </div>
+                <div className="summary-content">
+                  <div className="kanban-stats">
+                    <div className="stat-item">
+                      <span className="stat-number todo">{kanbanSummary.todo}</span>
+                      <span className="stat-label">To-Do</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-number doing">{kanbanSummary.doing}</span>
+                      <span className="stat-label">Doing</span>
+                    </div>
+                    <div className="stat-item">
+                      <span className="stat-number done">{kanbanSummary.done}</span>
+                      <span className="stat-label">Done</span>
+                    </div>
+                  </div>
+                  <Link to="/kanban" className="summary-action">
+                    <button className="mint-button small">
+                      View Board
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Today's Schedule */}
+            <div className="schedule-card">
+              <div className="section-header">
+                <h3>📅 TODAY'S SCHEDULE</h3>
+                <button 
+                  onClick={() => setShowAddSchedule(true)}
+                  className="add-task-btn"
+                >
+                  + Add Task
+                </button>
+              </div>
+              
+              {/* Add Task Form */}
+              {showAddSchedule && (
+                <div className="add-task-form">
                   <input
                     type="text"
                     placeholder="Task title"
                     value={newTask.title}
-                    onChange={e => setNewTask(t => ({ ...t, title: e.target.value }))}
+                    onChange={(e) => setNewTask(prev => ({...prev, title: e.target.value}))}
+                    className="task-input"
                   />
-                  <select
-                    value={newTask.priority}
-                    onChange={e => setNewTask(t => ({ ...t, priority: e.target.value }))}
-                  >
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="High">High</option>
-                  </select>
-                  <button onClick={handleAddTask}>Add</button>
-                  <button onClick={() => setShowTaskInput(false)}>Cancel</button>
+                  <div className="task-time-date">
+                    <input
+                      type="time"
+                      value={newTask.time}
+                      onChange={(e) => setNewTask(prev => ({...prev, time: e.target.value}))}
+                      className="task-time-input"
+                      placeholder="Set time"
+                    />
+                  </div>
+                  <div className="task-form-actions">
+                    <button onClick={addScheduleTask} className="save-task-btn">Save</button>
+                    <button onClick={() => setShowAddSchedule(false)} className="cancel-task-btn">Cancel</button>
+                  </div>
                 </div>
               )}
-
-              <div className="tasks-list">
-                {tasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className={`task-item ${task.completed ? 'completed' : ''}`}
-                    style={{
-                      backgroundColor: task.priority === 'High' ? '#fdd' : task.priority === 'Medium' ? '#e5eaff' : '#c6d9c2',
-                      borderRadius: '20px',
-                      padding: '10px 15px',
-                      marginBottom: '10px',
-                      fontWeight: 'bold',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <div onClick={() => toggleTaskCompletion(task.id, task.completed)} style={{ cursor: 'pointer', flex: 1 }}>
-                      {task.completed ? '✓ ' : ''}{task.title} {task.priority === 'High' ? '🌶️🌶️' : task.priority === 'Medium' ? '🌶️' : ''}
-                    </div>
-                    <button 
-                      onClick={() => deleteTask(task.id)} 
-                      className="delete-btn"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#e53e3e' }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                ))}
-                {tasks.length === 0 && (
-                  <div className="empty-state">
-                    No tasks for today. Add some tasks to get started! 🎯
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="schedule-box">
-              <div className="section-header">
-                <h3>TODAY'S SCHEDULE</h3>
-                <button 
-                  onClick={() => setShowScheduleInput(!showScheduleInput)} 
-                  className="add-btn"
-                >
-                  {showScheduleInput ? '✕' : '+'} 
-                </button>
-              </div>
-
+              
               <div className="schedule-list">
-                {schedule.map((item) => (
-                  <div key={item.id} className="schedule-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <div>
-                      <strong>{item.time}</strong> {item.task} ✅
-                      <small style={{ display: 'block', color: '#666', fontSize: '0.8em' }}>
-                        from {item.source || 'dashboard'}
-                      </small>
-                    </div>
-                    <button 
-                      onClick={() => deleteSchedule(item.id)} 
-                      className="delete-btn"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#e53e3e' }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                ))}
-                {schedule.length === 0 && (
+                {upcomingTasks.length === 0 ? (
                   <div className="empty-state">
-                    No scheduled items for today. Set your schedule! 📅
+                    No scheduled items for today. Time to plan! ✨
                   </div>
+                ) : (
+                  upcomingTasks.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className={`schedule-item ${item.completed ? 'completed' : ''} ${!canTickTask(item) ? 'future-task' : ''}`}
+                    >
+                      <div className="schedule-content">
+                        <input
+                          type="checkbox"
+                          checked={item.completed || false}
+                          onChange={() => toggleScheduleCompletion(item.id, item.completed)}
+                          disabled={!canTickTask(item)}
+                          className="schedule-checkbox"
+                        />
+                        <div className="schedule-details">
+                          {editingTask === item.id ? (
+                            <div className="edit-task-form">
+                              <input
+                                type="text"
+                                value={item.task}
+                                onChange={(e) => {
+                                  const updatedTasks = todaysSchedule.map(t => 
+                                    t.id === item.id ? {...t, task: e.target.value} : t
+                                  );
+                                  setTodaysSchedule(updatedTasks);
+                                }}
+                                className="edit-task-input"
+                              />
+                              <input
+                                type="time"
+                                value={item.time}
+                                onChange={(e) => {
+                                  const updatedTasks = todaysSchedule.map(t => 
+                                    t.id === item.id ? {...t, time: e.target.value} : t
+                                  );
+                                  setTodaysSchedule(updatedTasks);
+                                }}
+                                className="edit-time-input"
+                              />
+                              <div className="edit-actions">
+                                <button 
+                                  onClick={() => editScheduleTask(item.id, {task: item.task, time: item.time})}
+                                  className="save-edit-btn"
+                                >
+                                  ✓
+                                </button>
+                                <button 
+                                  onClick={() => setEditingTask(null)}
+                                  className="cancel-edit-btn"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <span className="schedule-time">{formatTime12Hour(item.time)}</span>
+                              <span className="schedule-task">{item.task}</span>
+                              {(isFutureTask(item) || !item.completed) && (
+                                <button 
+                                  onClick={() => setEditingTask(item.id)}
+                                  className="edit-task-btn"
+                                >
+                                  ✏️
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
                 )}
               </div>
-
-              {showScheduleInput && (
-                <div className="schedule-input">
-                  <input
-                    type="time"
-                    value={newSchedule.time}
-                    onChange={e => setNewSchedule(s => ({ ...s, time: e.target.value }))}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Task"
-                    value={newSchedule.task}
-                    onChange={e => setNewSchedule(s => ({ ...s, task: e.target.value }))}
-                  />
-                  <button onClick={handleAddSchedule}>Add</button>
-                  <button onClick={() => setShowScheduleInput(false)}>Cancel</button>
-                </div>
-              )}
             </div>
           </div>
 
-          <div className="utility-box">
-            <div>
-              <h3>Need a Mint?</h3>
-              <button onClick={() => alert(mintQuote)} className="mint-button">
-                🌿 NEED A MINT
-              </button>
-            </div>
-            <div className="progress-chart">
-              <h3>Progress</h3>
-              <div className="progress-visual">
-                <svg width="100" height="100">
-                  <circle cx="50" cy="50" r="40" className="progress-bg" />
-                  <circle
-                    cx="50" cy="50"
-                    r="40"
-                    className="progress-fg"
-                    strokeDasharray={`${percent * 2.5} 999`}
-                    transform="rotate(-90 50 50)"
-                  />
-                </svg>
-                <div className="progress-text">
-                  <span className="progress-percent">{percent}%</span>
-                  <span className="progress-label">{completed}/{totalTasks} tasks</span>
+          {/* Mint It - Daily Reflection Section */}
+          {!journalEntry.submitted && (
+            <section className="mint-it-section">
+              <h2 className="mint-it-title">🌿 Mint It – Daily Reflection</h2>
+              
+              <div className="mint-it-container">
+                {/* Sticky Note 1: Today I felt */}
+                <div className="sticky-note-wrapper">
+                  <div className="sticky-note feelings">
+                    <h4 className="sticky-note-title">Today I felt...</h4>
+                    <textarea
+                      placeholder="happy, overwhelmed, grateful, tired..."
+                      value={journalEntry.feeling}
+                      onChange={(e) => setJournalEntry(prev => ({...prev, feeling: e.target.value}))}
+                      className="sticky-textarea"
+                      rows="4"
+                    />
+                  </div>
+                </div>
+
+                {/* Sticky Note 2: Grateful for */}
+                <div className="sticky-note-wrapper">
+                  <div className="sticky-note gratitude">
+                    <h4 className="sticky-note-title">One thing I'm grateful for...</h4>
+                    <textarea
+                      placeholder="my morning coffee, a friend's text, completing a task..."
+                      value={journalEntry.gratitude}
+                      onChange={(e) => setJournalEntry(prev => ({...prev, gratitude: e.target.value}))}
+                      className="sticky-textarea"
+                      rows="4"
+                    />
+                  </div>
+                </div>
+
+                {/* Affirmation of the Day */}
+                <div className="affirmation-wrapper">
+                  <h4 className="affirmation-title">Affirmation of the Day</h4>
+                  <div className="affirmation-text">
+                    {dailyAffirmation}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+
+              {/* Mood Tracker */}
+              <div className="mood-tracker-section">
+                <label className="mood-label">How are you feeling today?</label>
+                <div className="mood-tracker">
+                  {[
+                    { emoji: '😊', label: 'Great' },
+                    { emoji: '🙂', label: 'Good' },
+                    { emoji: '😐', label: 'Okay' },
+                    { emoji: '😔', label: 'Down' },
+                    { emoji: '😰', label: 'Stressed' }
+                  ].map((mood) => (
+                    <button
+                      key={mood.label}
+                      type="button"
+                      className={`mood-button ${selectedMood === mood.label ? 'selected' : ''}`}
+                      onClick={() => setSelectedMood(mood.label)}
+                    >
+                      <span className="mood-emoji">{mood.emoji}</span>
+                      <span className="mood-label">{mood.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => {
+                  if (!selectedMood || !journalEntry.gratitude.trim() || !journalEntry.feeling.trim()) {
+                    alert('Please complete all fields: select your mood, describe how you felt, and add something you\'re grateful for.');
+                    return;
+                  }
+                  submitJournalEntry();
+                }}
+                className="mint-it-btn"
+              >
+                Mint it ✨
+              </button>
+            </section>
+          )}
+
+          {/* Show submitted journal state */}
+          {journalEntry.submitted && (
+            <section className="mint-it-section completed">
+              <h2 className="mint-it-title">🌿 Mint It – Daily Reflection</h2>
+              <div className="mint-it-container completed">
+                <div className="completed-message">
+                  <div className="completed-icon">✨</div>
+                  <h3>Today's Mint - Complete!</h3>
+                  <p>Thank you for taking time to reflect today! Your thoughts have been minted. 💚</p>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       </main>
     </div>

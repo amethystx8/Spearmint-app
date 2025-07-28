@@ -50,6 +50,921 @@ body, h1, h2, h3, p, ul, li, button {
   gap: 0.5rem;
 }
 
+/* Dashboard Main Content */
+.dashboard-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #C8E6C9, #A5D6A7);
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.greeting {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2E7D32;
+  margin-bottom: 0.5rem;
+}
+
+.positive-reinforcement {
+  color: #388E3C;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.subtext {
+  color: #4CAF50;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.time-display {
+  text-align: right;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2E7D32;
+  line-height: 1.3;
+}
+
+/* Dashboard Header with Date/Time */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+/* Logout button in header */
+.dashboard-header .logout-btn {
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-header .logout-btn:hover {
+  background-color: #ff5252;
+}
+
+/* Greeting Section within Header */
+.dashboard-header .greeting-section {
+  text-align: left;
+}
+
+.dashboard-header .greeting-section .greeting {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2D5A27;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-header .greeting-section .daily-affirmation {
+  font-size: 1.1rem;
+  color: #10B981;
+  font-style: italic;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.dashboard-header .greeting-section .positive-reinforcement {
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Time Display */
+.time-display {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2D5A27;
+  text-align: right;
+  line-height: 1.4;
+}
+
+/* Standalone Greeting Section Styles (for backward compatibility) */
+.greeting-section {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.greeting-section .greeting {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2D5A27;
+  margin-bottom: 0.5rem;
+}
+
+.greeting-section .daily-affirmation {
+  font-size: 1.1rem;
+  color: #10B981;
+  font-style: italic;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.greeting-section .positive-reinforcement {
+  color: #059669;
+  font-weight: 600;
+}
+
+/* White Mint Action Section */
+.mint-action-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.white-mint-button {
+  background: white;
+  color: #10B981;
+  border: 2px solid #10B981;
+  border-radius: 20px;
+  padding: 1rem 3rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 300px;
+}
+
+.white-mint-button:hover {
+  background: #10B981;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.kpi-schedule-container {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.kpi-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-content-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* White Card Styles - No borders or shadows */
+.schedule-card, .wellbeing-card, .summary-card, .sticky-journal-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 1.5rem;
+  /* Removed border and box-shadow for clean white look */
+}
+
+/* Schedule Management Styles */
+.add-task-btn {
+  background: #10B981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-task-btn:hover {
+  background: #059669;
+}
+
+.add-task-form {
+  background: #F8FAFC;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.task-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.task-time-date {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.task-time-input, .task-date-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.task-form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.save-task-btn {
+  background: #10B981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.cancel-task-btn {
+  background: #6B7280;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+/* Schedule Item Styles */
+.schedule-item.future-task {
+  opacity: 0.6;
+}
+
+.schedule-item.future-task .schedule-checkbox {
+  cursor: not-allowed;
+}
+
+.edit-task-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.edit-task-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.edit-task-input, .edit-time-input {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #D1D5DB;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.edit-task-input {
+  flex: 2;
+}
+
+.edit-time-input {
+  flex: 1;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.save-edit-btn, .cancel-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+}
+
+.save-edit-btn {
+  color: #10B981;
+}
+
+.cancel-edit-btn {
+  color: #EF4444;
+}
+
+/* Sticky Note Journal Styles */
+.sticky-journal-card {
+  background: transparent;
+  padding: 0;
+}
+
+.sticky-note {
+  background: #FEF3C7;
+  border-radius: 0;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  position: relative;
+  transform: rotate(-1deg);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.sticky-note::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 20px;
+  background: #F59E0B;
+  border-radius: 0 0 8px 8px;
+  opacity: 0.7;
+}
+
+.sticky-note.completed {
+  background: #D1FAE5;
+  transform: rotate(1deg);
+}
+
+.sticky-header h3 {
+  margin: 0;
+  color: #92400E;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.sticky-content {
+  color: #78350F;
+}
+
+.sticky-field {
+  margin-bottom: 1rem;
+}
+
+.sticky-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #92400E;
+  font-size: 1rem;
+}
+
+.sticky-input-container {
+  position: relative;
+}
+
+.sticky-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  background: rgba(255,255,255,0.3);
+  border-radius: 8px;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-size: 1rem;
+  color: #78350F;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.sticky-textarea::placeholder {
+  color: #A16207;
+  font-style: italic;
+}
+
+.mint-it-btn {
+  background: #10B981;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: block;
+  margin: 1.5rem auto 0;
+  transition: all 0.3s ease;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.mint-it-btn:hover {
+  background: #059669;
+  transform: scale(1.05);
+}
+
+.completed-message {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #065F46;
+  margin-bottom: 1rem;
+}
+
+/* Mood Tracker Styles */
+.mood-tracker {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.mood-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.mood-button:hover {
+  border-color: #10B981;
+  background: #F0FDF4;
+}
+
+.mood-button.selected {
+  border-color: #10B981;
+  background: #10B981;
+  color: white;
+}
+
+.mood-emoji {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.mood-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  /* Removed border for clean white look */
+}
+
+.section-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2E7D32;
+  letter-spacing: 0.5px;
+}
+
+/* Schedule Card */
+.upcoming-alert {
+  background: #FFF3E0;
+  border: 2px solid #FFB74D;
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #E65100;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.schedule-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  background: #F1F8E9;
+  border-radius: 12px;
+  border-left: 4px solid #66BB6A;
+  transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+  background: #E8F5E8;
+  transform: translateX(5px);
+}
+
+.schedule-item.completed {
+  background: #C8E6C9;
+  opacity: 0.8;
+  border-left-color: #4CAF50;
+}
+
+.schedule-item.past-due {
+  background: #FFEBEE;
+  border-left-color: #F44336;
+}
+
+.schedule-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.schedule-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: #4CAF50;
+  cursor: pointer;
+}
+
+.schedule-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.schedule-time {
+  font-weight: 700;
+  color: #2E7D32;
+  font-size: 1rem;
+}
+
+.schedule-task {
+  color: #388E3C;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+/* Well-being Card */
+.wellbeing-card {
+  background: linear-gradient(135deg, #E1F5FE, #F3E5F5);
+  border: 2px solid #B39DDB;
+}
+
+.journal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.journal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.journal-field label {
+  font-weight: 600;
+  color: #4A148C;
+  font-size: 0.95rem;
+}
+
+.journal-input {
+  padding: 0.8rem;
+  border: 2px solid #CE93D8;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background: #FFFFFF;
+  transition: border-color 0.3s ease;
+}
+
+.journal-input:focus {
+  outline: none;
+  border-color: #9C27B0;
+  box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.1);
+}
+
+.affirmation {
+  background: #F3E5F5;
+  padding: 1rem;
+  border-radius: 12px;
+  border-left: 4px solid #9C27B0;
+  margin: 0.5rem 0;
+}
+
+.daily-affirmation {
+  color: #6A1B9A;
+  font-style: italic;
+  font-weight: 500;
+  margin: 0.5rem 0 0 0;
+}
+
+/* Summary Cards */
+.summary-card {
+  height: fit-content;
+}
+
+.pomodoro-card {
+  background: linear-gradient(135deg, #FFEBEE, #FCE4EC);
+  border: 2px solid #F8BBD9;
+}
+
+.kanban-card {
+  background: linear-gradient(135deg, #E3F2FD, #E1F5FE);
+  border: 2px solid #81D4FA;
+}
+
+.breather-card {
+  background: linear-gradient(135deg, #E8F5E8, #C8E6C9);
+  border: 2px solid #A5D6A7;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.session-count {
+  text-align: center;
+}
+
+.big-number {
+  display: block;
+  font-size: 3rem;
+  font-weight: 800;
+  color: #C2185B;
+  line-height: 1;
+}
+
+.label {
+  font-size: 0.9rem;
+  color: #880E4F;
+  font-weight: 600;
+}
+
+.kanban-stats {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-number.todo { color: #FF9800; }
+.stat-number.doing { color: #2196F3; }
+.stat-number.done { color: #4CAF50; }
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #555;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
+.breather-text {
+  text-align: center;
+  color: #2E7D32;
+  font-size: 0.95rem;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+/* Buttons */
+.mint-button {
+  background: linear-gradient(135deg, #66BB6A, #4CAF50);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.mint-button:hover {
+  background: linear-gradient(135deg, #4CAF50, #388E3C);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.mint-button.small {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.85rem;
+}
+
+.mint-button.journal-submit {
+  background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+  box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+}
+
+.mint-button.journal-submit:hover {
+  background: linear-gradient(135deg, #7B1FA2, #6A1B9A);
+  box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+}
+
+.mint-button.breather-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+.summary-action {
+  text-decoration: none;
+  width: 100%;
+}
+
+.summary-action button {
+  width: 100%;
+}
+
+/* Breather Mode */
+.breather-mode {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #A8E6CF, #DCEDC8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.breather-content {
+  text-align: center;
+  color: #2E7D32;
+}
+
+.breather-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 300;
+}
+
+.breather-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  opacity: 0.8;
+}
+
+.meditation-animation {
+  margin-bottom: 2rem;
+}
+
+.breathing-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.3), rgba(46, 125, 50, 0.1));
+  border: 3px solid #4CAF50;
+  margin: 0 auto;
+  animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+/* Empty States */
+.empty-state {
+  text-align: center;
+  color: #81C784;
+  font-style: italic;
+  padding: 2rem;
+  background: #F1F8E9;
+  border-radius: 12px;
+  border: 2px dashed #C8E6C9;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .kpi-schedule-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .kpi-section {
+    flex-direction: row;
+    gap: 1rem;
+  }
+  
+  .summary-card {
+    min-width: 250px;
+  }
+  
+  .white-mint-button {
+    font-size: 1.3rem;
+    padding: 0.8rem 2rem;
+    min-width: 250px;
+  }
+
+  .task-time-date {
+    flex-direction: column;
+  }
+
+  .edit-task-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    padding: 1rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .dashboard-header .greeting-section {
+    text-align: center;
+  }
+  
+  .dashboard-header .greeting-section .greeting {
+    font-size: 2rem;
+  }
+  
+  .time-display {
+    text-align: center;
+    font-size: 1.2rem;
+  }
+  
+  .kpi-section {
+    flex-direction: column;
+  }
+  
+  .white-mint-button {
+    font-size: 1.2rem;
+    padding: 0.7rem 1.5rem;
+    min-width: 200px;
+  }
+  
+  .mood-tracker {
+    justify-content: center;
+  }
+
+  .sticky-note {
+    transform: rotate(0deg);
+    margin: 0 auto;
+  }
+
+  .add-task-form {
+    padding: 0.75rem;
+  }
+
+  .task-form-actions {
+    flex-direction: column;
+  }
+}
+
+/* Legacy styles for compatibility - keeping existing styles for backward compatibility */
+
 .logout-btn:hover {
   color: #fff;
 }
@@ -179,4 +1094,238 @@ body, h1, h2, h3, p, ul, li, button {
   font-size: 24px;
   font-weight: bold;
   color: #333;
+}
+
+/* Mint It Section - Redesigned Layout */
+.mint-it-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.mint-it-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #155c4a;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mint-it-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+/* Sticky Note Wrappers */
+.sticky-note-wrapper {
+  flex: 1;
+  max-width: 30%;
+}
+
+.sticky-note {
+  background: #FEF3C7; /* Light pastel yellow */
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: rotate(-1deg);
+  font-family: 'Patrick Hand', 'Indie Flower', cursive, sans-serif;
+  transition: transform 0.3s ease;
+  min-height: 180px;
+}
+
+.sticky-note:hover {
+  transform: rotate(0deg);
+}
+
+.sticky-note.gratitude {
+  background: #D1FAE5; /* Light mint green */
+  transform: rotate(1deg);
+}
+
+.sticky-note-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+  font-family: 'Patrick Hand', 'Indie Flower', cursive, sans-serif;
+}
+
+.sticky-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Patrick Hand', 'Indie Flower', cursive, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.sticky-textarea::placeholder {
+  color: #9CA3AF;
+  font-style: italic;
+}
+
+/* Affirmation Wrapper */
+.affirmation-wrapper {
+  flex: 1;
+  max-width: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.affirmation-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #155c4a;
+  margin-bottom: 1rem;
+}
+
+.affirmation-text {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #374151;
+  line-height: 1.6;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #A8E6CF, #88D5A3);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Mood Tracker Section */
+.mood-tracker-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mood-label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #155c4a;
+  margin-bottom: 1rem;
+}
+
+.mood-tracker {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.mood-button {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 80px;
+}
+
+.mood-button:hover {
+  border-color: #A8E6CF;
+  background: #f0fdf4;
+}
+
+.mood-button.selected {
+  border-color: #155c4a;
+  background: #A8E6CF;
+}
+
+.mood-emoji {
+  font-size: 1.5rem;
+}
+
+.mood-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Mint It Button */
+.mint-it-btn {
+  background: linear-gradient(135deg, #155c4a, #22c55e);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+.mint-it-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21, 92, 74, 0.3);
+}
+
+/* Completed State */
+.mint-it-section.completed {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+
+.mint-it-container.completed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.completed-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.completed-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.completed-message h3 {
+  color: #155c4a;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.completed-message p {
+  color: #374151;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mint-it-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .sticky-note-wrapper,
+  .affirmation-wrapper {
+    max-width: 100%;
+  }
+  
+  .mood-tracker {
+    gap: 0.5rem;
+  }
+  
+  .mood-button {
+    min-width: 70px;
+    padding: 0.5rem;
+  }
 }

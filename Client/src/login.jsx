@@ -20,6 +20,7 @@ export default function Login() {
       const res = await axios.post('http://localhost:3000/users/login', formData);
       alert(`Welcome back, ${res.data.fullname}!`);
       localStorage.setItem('username', res.data.username);
+      localStorage.setItem('user', JSON.stringify(res.data)); // Store complete user object
       navigate('/dashboard'); // Redirect to dashboard after successful login
     } catch (err) {
       console.error(err);
