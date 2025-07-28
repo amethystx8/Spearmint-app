@@ -1329,3 +1329,237 @@ body, h1, h2, h3, p, ul, li, button {
     padding: 0.5rem;
   }
 }
+
+/* Enhanced Schedule UI */
+.schedule-card.enhanced {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f9ff;
+}
+
+.schedule-card.enhanced .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f8fafc;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.header-content h3 {
+  margin: 0;
+  color: #155c4a;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.task-count {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.add-task-btn.modern {
+  background: linear-gradient(135deg, #155c4a, #22c55e);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(21, 92, 74, 0.2);
+}
+
+.add-task-btn.modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21, 92, 74, 0.3);
+}
+
+.add-icon {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+/* Enhanced Schedule Items */
+.schedule-item {
+  background: #fafbfc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.schedule-item:hover {
+  background: #f8fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.schedule-item.completed {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border-color: #86efac;
+}
+
+.schedule-item.future-task {
+  background: linear-gradient(135deg, #fef7cd, #fef3c7);
+  border-color: #fcd34d;
+}
+
+.schedule-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.schedule-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid #cbd5e0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.schedule-checkbox:checked {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+.schedule-details {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.schedule-time {
+  background: #155c4a;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: center;
+}
+
+.schedule-task {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  flex: 1;
+}
+
+.edit-task-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.edit-task-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+/* Completed Sticky Notes */
+.sticky-note.completed {
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+}
+
+.sticky-note.completed.gratitude {
+  background: #f0f9ff;
+  border: 2px solid #7dd3fc;
+}
+
+.sticky-content-text {
+  font-family: 'Patrick Hand', 'Indie Flower', cursive, sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #374151;
+  min-height: 60px;
+  padding: 0.5rem 0;
+}
+
+.mood-display {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.mood-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.affirmation-text.completed {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border: 2px solid #86efac;
+}
+
+.completion-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border-radius: 12px;
+  border: 1px solid #86efac;
+}
+
+.completion-icon {
+  font-size: 1.5rem;
+}
+
+.completion-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #155c4a;
+}
+
+.edit-journal-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-journal-btn:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}

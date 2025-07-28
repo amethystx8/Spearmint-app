@@ -76,6 +76,9 @@ export default function Dashboard() {
     submitted: false
   });
 
+  // Store submitted journal data for display
+  const [submittedJournalData, setSubmittedJournalData] = useState(null);
+
   // Mood tracker state
   const [selectedMood, setSelectedMood] = useState('');
   
@@ -355,7 +358,14 @@ export default function Dashboard() {
         )
       );
       
-      setJournalEntry(prev => ({ ...prev, submitted: !snapshot.empty }));
+      if (!snapshot.empty) {
+        const journalData = snapshot.docs[0].data();
+        setJournalEntry(prev => ({ ...prev, submitted: true }));
+        setSubmittedJournalData(journalData);
+      } else {
+        setJournalEntry(prev => ({ ...prev, submitted: false }));
+        setSubmittedJournalData(null);
+      }
     } catch (error) {
       console.warn('Could not check journal status:', error);
     }
@@ -420,7 +430,7 @@ export default function Dashboard() {
         return;
       }
 
-      await addDoc(collection(db, 'userJournal'), {
+      const journalData = {
         userId: user.uid,
         username: username,
         date: today,
@@ -430,9 +440,12 @@ export default function Dashboard() {
         affirmation: dailyAffirmation,
         timestamp: new Date(),
         createdAt: new Date()
-      });
+      };
+
+      await addDoc(collection(db, 'userJournal'), journalData);
       
       setJournalEntry(prev => ({ ...prev, submitted: true }));
+      setSubmittedJournalData(journalData);
       setSelectedMood('');
       
       // Show success message
@@ -585,15 +598,19 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Today's Schedule */}
-            <div className="schedule-card">
+            {/* Today's Schedule - Enhanced UI */}
+            <div className="schedule-card enhanced">
               <div className="section-header">
-                <h3>📅 TODAY'S SCHEDULE</h3>
+                <div className="header-content">
+                  <h3>📅 TODAY'S SCHEDULE</h3>
+                  <span className="task-count">{upcomingTasks.length} {upcomingTasks.length === 1 ? 'task' : 'tasks'}</span>
+                </div>
                 <button 
                   onClick={() => setShowAddSchedule(true)}
-                  className="add-task-btn"
+                  className="add-task-btn modern"
                 >
-                  + Add Task
+                  <span className="add-icon">+</span>
+                  <span>Add Task</span>
                 </button>
               </div>
               
@@ -787,16 +804,70 @@ export default function Dashboard() {
             </section>
           )}
 
-          {/* Show submitted journal state */}
-          {journalEntry.submitted && (
+          {/* Show submitted journal data in sticky notes */}
+          {journalEntry.submitted && submittedJournalData && (
             <section className="mint-it-section completed">
               <h2 className="mint-it-title">🌿 Mint It – Daily Reflection</h2>
-              <div className="mint-it-container completed">
-                <div className="completed-message">
-                  <div className="completed-icon">✨</div>
-                  <h3>Today's Mint - Complete!</h3>
-                  <p>Thank you for taking time to reflect today! Your thoughts have been minted. 💚</p>
+              
+              <div className="mint-it-container">
+                {/* Sticky Note 1: Today I felt - with data */}
+                <div className="sticky-note-wrapper">
+                  <div className="sticky-note feelings completed">
+                    <h4 className="sticky-note-title">Today I felt...</h4>
+                    <div className="sticky-content-text">
+                      {submittedJournalData.feeling}
+                    </div>
+                    <div className="mood-display">
+                      {submittedJournalData.mood && (
+                        <span className="mood-badge">
+                          {submittedJournalData.mood === 'Great' && '😊'}
+                          {submittedJournalData.mood === 'Good' && '🙂'}
+                          {submittedJournalData.mood === 'Okay' && '😐'}
+                          {submittedJournalData.mood === 'Down' && '😔'}
+                          {submittedJournalData.mood === 'Stressed' && '😰'}
+                          {submittedJournalData.mood}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                {/* Sticky Note 2: Grateful for - with data */}
+                <div className="sticky-note-wrapper">
+                  <div className="sticky-note gratitude completed">
+                    <h4 className="sticky-note-title">One thing I'm grateful for...</h4>
+                    <div className="sticky-content-text">
+                      {submittedJournalData.gratitude}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Affirmation of the Day - with data */}
+                <div className="affirmation-wrapper">
+                  <h4 className="affirmation-title">Affirmation of the Day</h4>
+                  <div className="affirmation-text completed">
+                    {submittedJournalData.affirmation}
+                  </div>
+                </div>
+              </div>
+
+              <div className="completion-status">
+                <span className="completion-icon">✨</span>
+                <span className="completion-text">Your thoughts have been minted!</span>
+                <button 
+                  onClick={() => {
+                    setJournalEntry({
+                      feeling: submittedJournalData.feeling,
+                      gratitude: submittedJournalData.gratitude,
+                      submitted: false
+                    });
+                    setSelectedMood(submittedJournalData.mood);
+                    setSubmittedJournalData(null);
+                  }}
+                  className="edit-journal-btn"
+                >
+                  ✏️ Edit
+                </button>
               </div>
             </section>
           )}
