@@ -7,13 +7,14 @@ export default function Sidebar() {
 
   const menuItems = [
     { path: '/dashboard', icon: '📊', label: 'Dashboard' },
-    { path: '/kanban', icon: '📋', label: 'Kanban' },
+    { path: '/kanban', icon: '📋', label: 'To-Do' },
     { path: '/pomodoro', icon: '🍅', label: 'Pomodoro' },
     { path: '/settings', icon: '⚙️', label: 'Settings' }
   ];
 
   const handleLogout = () => {
     localStorage.removeItem('username');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 

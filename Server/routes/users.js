@@ -80,6 +80,7 @@ router.post('/login', async (req, res) => {
     console.log('User logged in:', username);
     return res.json({
       message: 'Login successful',
+      uid: snapshot.docs[0].id, // Add the document ID as uid
       username: user.username,
       fullname: user.fullname,
       email: user.email
